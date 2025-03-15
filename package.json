@@ -10,7 +10,8 @@
   "scripts": {
     "develop": "tsc -p tsconfig.server.json -w",
     "build": "tsc -p tsconfig.server.json",
-    "prepublish": "yarn build"
+    "prepublish": "yarn build",
+    "preinstall": "yarn build"
   },
   "files": [
     "dist/",
