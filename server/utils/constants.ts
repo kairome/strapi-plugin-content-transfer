@@ -1,0 +1,1 @@
+export const INTEGRATION_COLLECTION_UID = 'plugin::content-transfer.integration';
