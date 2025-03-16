@@ -8,7 +8,12 @@ const Container = styled(Box)`
 
 
 const PageContainer: React.FC = (props) => {
-  const selectedTheme = localStorage.getItem('STRAPI_THEME');
+  const lsTheme = localStorage.getItem('STRAPI_THEME');
+  const preferredOsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const preferredOsTheme = preferredOsDark ? 'dark' : 'light';
+
+  const selectedTheme = !lsTheme || lsTheme === 'system' ? preferredOsTheme : lsTheme;
+
   const theme = selectedTheme === 'dark' ? darkTheme : lightTheme;
 
   return (
