@@ -14,6 +14,7 @@
   },
   "files": [
     "dist/",
+    "admin/",
     "strapi-admin.js",
     "strapi-server.js"
   ],
