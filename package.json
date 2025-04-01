@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-content-transfer",
-  "version": "0.0.0-alpha",
+  "version": "0.0.1-alpha",
   "description": "Transfer content between strapi instances. Supports the transfer of related entities and locales",
   "strapi": {
     "name": "content-transfer",
