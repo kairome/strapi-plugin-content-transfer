@@ -1,17 +1,16 @@
 {
   "name": "strapi-plugin-content-transfer",
   "version": "0.0.0",
-  "description": "This is the description of the plugin.",
+  "description": "Transfer content between strapi instances. Supports the transfer of related entities and locales",
   "strapi": {
     "name": "content-transfer",
-    "description": "Description of content-transfer plugin",
+    "description": "Transfer content between strapi instances. Supports the transfer of related entities and locales",
     "kind": "plugin"
   },
   "scripts": {
     "develop": "tsc -p tsconfig.server.json -w",
     "build": "tsc -p tsconfig.server.json",
-    "prepublish": "yarn build",
-    "preinstall": "yarn build"
+    "prepublish": "yarn build"
   },
   "files": [
     "dist/",
@@ -49,16 +48,17 @@
     "styled-components": "^5.2.1"
   },
   "author": {
-    "name": "A Strapi developer"
+    "name": "Artem"
   },
-  "maintainers": [
-    {
-      "name": "A Strapi developer"
-    }
-  ],
   "engines": {
     "node": ">=18.0.0 <=20.x.x",
     "npm": ">=6.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "strapi",
+    "strapi plugin",
+    "content transfer",
+    "strapi entity transfer"
+  ]
 }
