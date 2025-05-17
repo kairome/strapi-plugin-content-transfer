@@ -27,8 +27,8 @@ Navigate to `/admin/settings/content-transfer/integrations`.
 
 
 <div align="center">
-  <img width = "49%" src="">
-  <img width = "49%" src="">
+  <img width="49%" src="https://github.com/user-attachments/assets/0cff4a25-022a-4b2e-a326-07e14f74fe81" />
+  <img width="49%" src="https://github.com/user-attachments/assets/5fa47150-f8f3-4ba7-85e9-e893b6b06000" />
 </div>
 
 
@@ -47,22 +47,22 @@ Navigate to `/admin/plugins/content-transfer`. This is the main content transfer
 
 1. Select your collection
 <div align="center">
-  <img  src="">
+  <img src="https://github.com/user-attachments/assets/013cdabb-b20b-4086-aaa1-f993a1d4f125" />
 </div>
 
 2. Select entities you want to transfer
 <div align="center">
-  <img  src="">
+  <img src="https://github.com/user-attachments/assets/19775d3e-7261-4b71-a699-586a989de44b" />
 </div>
 
 3. Choose options in the control box and select the target instance
 <div align="center">
-  <img  src="">
+  <img src="https://github.com/user-attachments/assets/7bee8ca0-c136-47b3-8017-41f3fdc8d427" />
 </div>
 
 4. Press the button and wait for the transfer to finish
 <div align="center">
-  <img  src="">
+  <img src="https://github.com/user-attachments/assets/63695f75-39bd-4959-9412-8476b7011aa5" />
 </div>
 
 ## Transfer options
