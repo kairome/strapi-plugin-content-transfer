@@ -31,14 +31,7 @@ import { RemoteStrapiClient } from '../utils/request';
 import { createEntityLocalization, updateEntity } from './helpers/entities';
 
 const getCollections = async (strapi: Strapi) => {
-  if (!strapi.db) {
-    return {
-      data: [],
-      errors: [],
-    };
-  }
-
-  const settings = await strapi.db.query('strapi::core-store').findMany({
+  const settings = await strapi.db?.query('strapi::core-store').findMany({
     where: {
       value: {
         $containsi: 'uid',
@@ -158,7 +151,7 @@ const uploadMedia = async (payload: UploadMediaPayload) => {
 };
 
 const getDefaultLocales = async (strapi: Strapi, apiClient: RemoteStrapiClient): Promise<LocalesInfo> => {
-  const localDefaultLocale = await strapi.store({
+  const localDefaultLocale = await strapi.store?.({
     type: 'plugin',
     name: 'i18n'
   }).get({ key: 'default_locale' }) as string;
@@ -185,7 +178,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
   getCollections: () => getCollections(strapi),
 
   async getEntitiesByCollection(collectionId: Common.UID.ContentType) {
-    const entities = await strapi.entityService.findMany(collectionId, {});
+    const entities = await strapi.entityService?.findMany(collectionId, {});
     return {
       data: entities,
       errors: [],
@@ -202,7 +195,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
       },
     }));
 
-    const settings = await strapi.db.query('strapi::core-store').findMany({
+    const settings = await strapi.db?.query('strapi::core-store').findMany({
       where: {
         $or: byKeyFilter,
       }
@@ -258,12 +251,14 @@ export default ({ strapi }: { strapi: Strapi }) => ({
             }
 
 
-            const { localizations: currentLocaleLocalizations } = await strapi.entityService.findOne(relationKey, localeRelation.id, {
+            const relationEntity = await strapi.entityService?.findOne(relationKey, localeRelation.id, {
               populate: {
                 localizations: true,
               },
               locale: 'all',
             });
+
+            const currentLocaleLocalizations = relationEntity?.localizations ?? null;
 
             // each translation should be connected to a parent entity in default locale
             const defaultLocaleParent = _.find(currentLocaleLocalizations, l => l.locale === localsInfo.remoteDefaultLocale);
@@ -370,12 +365,14 @@ export default ({ strapi }: { strapi: Strapi }) => ({
             continue;
           }
 
-          const { localizations: oldRelationLocalizations } = await strapi.entityService.findOne(relationKey, oldRelation.id, {
+          const defaultLangRelationEntity = await strapi.entityService?.findOne(relationKey, oldRelation.id, {
             populate: {
               localizations: true,
             },
             locale: 'all',
           });
+
+          const oldRelationLocalizations = defaultLangRelationEntity?.localizations ?? null;
 
           const existingOldLocalizations = await getRemoteFilteredEntities(oldRelationLocalizations, mainField, collectionApiClient, 'locale=all');
 
@@ -501,12 +498,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
         }
 
         // copy the result to keep oldId and modelId in the original data (relations without locale do not transfer to localized entities otherwise)
-        const relationRes = { ...res };
-
-        // @ts-ignore
-        delete relationRes.oldId;
-        // @ts-ignore
-        delete relationRes.modelId;
+        const relationRes = _.omit(res, ['oldId', 'modelId']) as Entity;
         acc.push(relationRes);
         return acc;
       }, [] as Entity[]);

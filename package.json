@@ -1,11 +1,12 @@
 {
   "name": "strapi-plugin-content-transfer",
-  "version": "0.0.1-alpha",
-  "description": "Transfer content between strapi instances. Supports the transfer of related entities and locales",
+  "version": "1.0.0",
+  "description": "Transfer content between strapi instances. Supports the transfer of related media files, entities and locales",
   "strapi": {
     "name": "content-transfer",
     "description": "Transfer content between strapi instances. Supports the transfer of related entities and locales",
-    "kind": "plugin"
+    "kind": "plugin",
+    "displayName": "Content Transfer"
   },
   "scripts": {
     "develop": "tsc -p tsconfig.server.json -w",
@@ -49,7 +50,12 @@
     "styled-components": "^5.2.1"
   },
   "author": {
-    "name": "Artem"
+    "name": "Artem",
+    "url": "https://github.com/kairome"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kairome/strapi-plugin-content-transfer"
   },
   "engines": {
     "node": ">=18.0.0 <=20.x.x",
