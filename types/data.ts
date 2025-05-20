@@ -42,7 +42,18 @@ export interface RelationFields {
   repeatable: boolean,
   type: string,
   uid: Common.UID.ContentType,
+  [k: string]: unknown,
 }
+
+export type RelationValues = {
+  [k: string]: Entity,
+};
+
+export type PopulateSchema = {
+  [k: string]: PopulateSchema | boolean | undefined,
+  on?: PopulateSchema,
+  populate?: PopulateSchema,
+};
 
 export interface MediaFile {
   id: number,

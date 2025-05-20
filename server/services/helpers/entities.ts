@@ -1,6 +1,7 @@
 import { CreateEntityLocalizationPayload, CreateEntityPayload, UpdateEntityPayload } from '../../../types/payloads';
 import { GenericUtilResponse } from '../../../types/data';
 import { getErrorDetails } from '../../utils/data';
+import { AxiosError } from 'axios';
 
 export const updateEntity = async (payload: UpdateEntityPayload): Promise<GenericUtilResponse> => {
   const {
@@ -35,7 +36,7 @@ export const updateEntity = async (payload: UpdateEntityPayload): Promise<Generi
       data: null,
       errors: [{
         message: `Failed to update ${modelId} entity ${entity[mainField]} (${entity.locale})`,
-        details: getErrorDetails(err),
+        details: getErrorDetails(err as AxiosError),
       }]
     };
   }
@@ -81,7 +82,7 @@ export const createEntity = async (payload: CreateEntityPayload) => {
       data: null,
       errors: [{
         message: `Failed to create ${modelId} entity ${entity[mainField]} (${entity.locale})`,
-        details: getErrorDetails(err),
+        details: getErrorDetails(err as AxiosError),
       }],
     };
   }
@@ -136,7 +137,7 @@ export const createEntityLocalization = async (payload: CreateEntityLocalization
       errors: [
         {
           message: `Failed to create localized entity ${modelId} for ${entity[mainField]} with locale ${entity.locale}`,
-          details: getErrorDetails(err),
+          details: getErrorDetails(err as AxiosError),
         }
       ],
     };

@@ -4,9 +4,9 @@
     "outDir": "dist",
     "rootDir": ".",
     "target": "ESNext",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "strict": true
   },
-
   "include": [
     // Include the root directory
     "server",

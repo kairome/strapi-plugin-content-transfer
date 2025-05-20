@@ -3,13 +3,14 @@ import { RemoteStrapiClient } from '../utils/request';
 import { AddIntegrationPayload } from '../../types/payloads';
 import * as _ from 'lodash';
 import { ApiEntitiesResponse, ErrorItem } from '../../types/data';
+import { AxiosError } from 'axios';
 
 export default ({ strapi }: { strapi: Strapi }) => ({
-  async getIntegrations(ctx) {
+  async getIntegrations(ctx: any) {
     const service = strapi.plugin('content-transfer').service('integrationsService');
     ctx.body = await service.getIntegrations();
   },
-  async createIntegration(ctx) {
+  async createIntegration(ctx: any) {
     const service = strapi.plugin('content-transfer').service('integrationsService');
     const payload: AddIntegrationPayload = ctx.request.body;
 
@@ -39,7 +40,8 @@ export default ({ strapi }: { strapi: Strapi }) => ({
         }
       }
     } catch (err) {
-      if (err.response && err.response.status === 401) {
+      const errResponse = (err as AxiosError).response;
+      if (errResponse && errResponse.status === 401) {
         errors.push({ message: 'Token is invalid.', field: 'token' });
       } else {
         errors.push({ message: `Failed to verify token: ${err}`, field: 'token' });
@@ -57,13 +59,14 @@ export default ({ strapi }: { strapi: Strapi }) => ({
     try {
       await integrationTestApi.create('');
     } catch (err) {
-      if (err.response) {
-        if (err.response.status === 403) {
+      const errResponse = (err as AxiosError).response;
+      if (errResponse) {
+        if (errResponse.status === 403) {
           errors.push({
             message: 'Token must have full access. Provided token lacks write permissions',
             field: 'token',
           });
-        } else if (err.response.status !== 400) {
+        } else if (errResponse.status !== 400) {
           errors.push({
             message: `Failed to verify write access: ${err}`,
             field: 'token',
@@ -83,11 +86,11 @@ export default ({ strapi }: { strapi: Strapi }) => ({
 
     ctx.body = await service.createIntegration(payload);
   },
-  async updateIntegration(ctx) {
+  async updateIntegration(ctx: any) {
     const service = strapi.plugin('content-transfer').service('integrationsService');
     ctx.body = await service.updateIntegration(ctx.params.integrationId, ctx.request.body);
   },
-  async deleteIntegration(ctx) {
+  async deleteIntegration(ctx: any) {
     const service = strapi.plugin('content-transfer').service('integrationsService');
     ctx.body = await service.deleteIntegration(ctx.params.integrationId);
   },

@@ -1,5 +1,5 @@
 import { Strapi } from '@strapi/strapi';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import axios, { AxiosError } from 'axios';
 import {
   CreateEntitiesPayload,
@@ -239,7 +239,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
 
           for (const localeRelation of localizedRelations) {
             const existingRemoteLocalization = _.find(remoteLocalizations, el => el.attributes[mainField] === localeRelation[mainField] && el.attributes.locale === localeRelation.locale);
-            // TODO: fix types
+
             if (existingRemoteLocalization) {
               newRelations.push({
                 ...existingRemoteLocalization.attributes,

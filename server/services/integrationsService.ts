@@ -5,7 +5,7 @@ import { INTEGRATION_COLLECTION_UID } from '../utils/constants';
 
 export default ({ strapi }: { strapi: Strapi }) => ({
   async getIntegrations() {
-    const integrations = await strapi.entityService.findMany(INTEGRATION_COLLECTION_UID, {
+    const integrations = await strapi.entityService?.findMany(INTEGRATION_COLLECTION_UID, {
       fields: ['id', 'url', 'name']
     });
     return {
@@ -16,7 +16,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
 
   async createIntegration(data: AddIntegrationPayload) {
     try {
-      const existingIntegrations = await strapi.entityService.findMany(INTEGRATION_COLLECTION_UID, {
+      const existingIntegrations = await strapi.entityService?.findMany(INTEGRATION_COLLECTION_UID, {
         filters: {
           $or: [
             { token: data.token },
@@ -32,7 +32,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
         };
       }
 
-      const resp = await strapi.entityService.create(INTEGRATION_COLLECTION_UID, { data });
+      const resp = await strapi.entityService?.create(INTEGRATION_COLLECTION_UID, { data });
       return {
         data: resp,
         errors: [],
@@ -46,12 +46,14 @@ export default ({ strapi }: { strapi: Strapi }) => ({
   },
   async updateIntegration(integrationId: number, payload: EditIntegrationPayload) {
     try {
-      const resp = await strapi.entityService.update(INTEGRATION_COLLECTION_UID, integrationId, {
+      const resp = await strapi.entityService?.update(INTEGRATION_COLLECTION_UID, integrationId, {
         data: {
           name: payload.name,
         } as any,
       });
-      resp.token = '';
+      if (resp) {
+        resp.token = '';
+      }
       return {
         data: resp,
         errors: [],
@@ -65,9 +67,9 @@ export default ({ strapi }: { strapi: Strapi }) => ({
   },
   async deleteIntegration(integrationId: number) {
     try {
-      const resp = await strapi.entityService.delete(INTEGRATION_COLLECTION_UID, integrationId);
+      const resp = await strapi.entityService?.delete(INTEGRATION_COLLECTION_UID, integrationId);
       return {
-        data: resp.id,
+        data: resp?.id ?? null,
         errors: [],
       };
     } catch (err) {

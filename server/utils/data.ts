@@ -1,15 +1,23 @@
 import * as _ from 'lodash';
-import { ApiEntity, Entity, ErrorDetailItem, ErrorItem, LocalesInfo, RelationFields } from 'types/data';
+import {
+  ApiEntity,
+  Entity,
+  ErrorDetailItem,
+  LocalesInfo,
+  MediaFile, PopulateSchema,
+  RelationFields,
+  RelationValues
+} from 'types/data';
 import { AxiosError } from 'axios';
 
 export const prepareEntityData = (entity: Entity, relationFields: RelationFields, getNewMediaFile: Function, getNewRelation: Function) => {
 
-  const recurDataFn = (value: Entity, parentKey?: string) => {
+  const recurDataFn = (value: Entity | Entity[], parentKey?: string) => {
     if ('localizations' in value) {
       delete value.localizations;
     }
 
-    return _.reduce(value, (acc, val, key) => {
+    return _.reduce(value, (acc: any, val, key) => {
       const fullKey = _.isNumber(key) ? parentKey : _.join(_.compact([parentKey, key]), '.');
 
       if (_.isObject(val) && 'mime' in val && 'url' in val) {
@@ -20,7 +28,7 @@ export const prepareEntityData = (entity: Entity, relationFields: RelationFields
       }
 
       if (_.isObject(val) || _.isArray(val)) {
-        const relationField = relationFields[fullKey];
+        const relationField = fullKey ? (relationFields as any)[fullKey] : null;
 
         if (relationField) {
           acc[key] = getNewRelation(relationField, val);
@@ -46,38 +54,7 @@ export const prepareEntityData = (entity: Entity, relationFields: RelationFields
   return recurDataFn(entity);
 };
 
-export const getFullCollectionSchema = (getModel: Function, collectionId: string) => {
-  const collectionModel = getModel(collectionId);
-  const schema = collectionModel.__schema__.attributes;
-
-  const result = _.reduce(schema, (acc, val, key) => {
-    if (val.type === 'component') {
-      acc[key] = {
-        ...val,
-        fields: getFullCollectionSchema(getModel, val.component),
-      };
-
-      return acc;
-    }
-
-    if (val.type === 'dynamiczone') {
-      acc[key] = _.map(val.components, zoneCmp => ({
-        type: 'component',
-        component: zoneCmp,
-        fields: getFullCollectionSchema(getModel, zoneCmp)
-      }));
-      return acc;
-    }
-
-    acc[key] = val;
-
-    return acc;
-  }, {});
-
-  return result;
-};
-
-export const getRelationFields = (getModel: Function, collectionId: string, parentKey?: string, repeatable?: boolean, dynamicZone?: boolean) => {
+export const getRelationFields = (getModel: Function, collectionId: string, parentKey?: string, repeatable?: boolean, dynamicZone?: boolean): RelationFields => {
   const collectionModel = getModel(collectionId);
   const schema = collectionModel.__schema__.attributes;
 
@@ -96,40 +73,40 @@ export const getRelationFields = (getModel: Function, collectionId: string, pare
     }
 
     if (val.type === 'dynamiczone') {
-      const zoneCmps = _.reduce(val.components, (acc, zoneCmp) => {
+      const zoneCmps: RelationFields = _.reduce(val.components, (acc, zoneCmp) => {
         return {
           ...acc,
           ...getRelationFields(getModel, zoneCmp, `${fullKey}.${zoneCmp}`, false, true),
         };
-      }, {});
+      }, {} as RelationFields);
 
       return { ...acc, ...zoneCmps };
     }
 
     return acc;
-  }, {});
+  }, {} as RelationFields);
 };
 
 export const getAllEntityMedia = (entity: Entity) => {
-  const res = _.reduce(entity, (acc, val: Entity) => {
+  const res = _.reduce(entity, (acc, val) => {
     if (_.isObject(val)) {
       if ('mime' in val && 'url' in val) {
-        acc.push(val);
+        acc.push(val as MediaFile);
         return acc;
       }
 
-      const nestedMedia = getAllEntityMedia(val);
+      const nestedMedia = getAllEntityMedia(val as Entity);
       acc.push(...nestedMedia);
       return acc;
     }
 
     return acc;
-  }, []);
+  }, [] as MediaFile[]);
 
   return _.uniqBy(res, 'id');
 };
 
-export const getEntitiesRelationValues = (entities: Entity[], relationFields: RelationFields) => {
+export const getEntitiesRelationValues = (entities: Entity[], relationFields: RelationFields): RelationValues => {
   const mergeVals = (objVal: Entity[] | undefined, sourceVal: Entity[] | undefined) => {
     return _.uniqBy(_.concat(objVal ?? [], sourceVal ?? []), 'id');
   };
@@ -139,7 +116,7 @@ export const getEntitiesRelationValues = (entities: Entity[], relationFields: Re
       const fullKey = _.isNumber(key) ? parentKey : _.join(_.compact([parentKey, key]), '.');
 
       if (_.isObject(val) || _.isArray(val)) {
-        const relationField = relationFields[fullKey];
+        const relationField = fullKey ? relationFields[fullKey] as RelationFields : null;
 
         if (relationField) {
           const previousVal = acc[relationField.uid] ?? [];
@@ -149,23 +126,23 @@ export const getEntitiesRelationValues = (entities: Entity[], relationFields: Re
         }
 
         const newParentKey = _.isObject(val) && '__component' in val ? `${fullKey}.${val.__component}` : fullKey;
-        const nestedResult = recurDataFn(val as Entity, newParentKey);
+        const nestedResult: any = recurDataFn(val as Entity, newParentKey);
         return _.isEmpty(nestedResult) ? acc : _.mergeWith(acc, nestedResult, mergeVals);
       }
 
       return acc;
-    }, {});
+    }, {} as any);
   };
 
   return _.reduce(entities, (acc, val) => {
     const relationVals = recurDataFn(val);
-    const localizedRelationVals = getEntitiesRelationValues(val.localizations, relationFields);
+    const localizedRelationVals = getEntitiesRelationValues(val.localizations ?? [], relationFields);
     const relationsWithLocalizedVals = _.mergeWith(relationVals, localizedRelationVals, mergeVals);
     return _.mergeWith(acc, relationsWithLocalizedVals, mergeVals);
   }, {});
 };
 
-export const getCollectionPopulateSchema = (getModel: Function, collectionId: string) => {
+export const getCollectionPopulateSchema = (getModel: Function, collectionId: string): PopulateSchema => {
   const collectionModel = getModel(collectionId);
   const schema = collectionModel.__schema__.attributes;
 
@@ -184,7 +161,7 @@ export const getCollectionPopulateSchema = (getModel: Function, collectionId: st
           const zoneComponents = _.reduce(val.components, (acc, zoneComponent) => ({
             ...acc,
             [zoneComponent]: getCollectionPopulateSchema(getModel, zoneComponent),
-          }), {});
+          }), {} as PopulateSchema);
 
           populateField[key] = {
             on: zoneComponents,
@@ -201,7 +178,7 @@ export const getCollectionPopulateSchema = (getModel: Function, collectionId: st
       }
 
       return acc;
-    }, {} as any);
+    }, {} as PopulateSchema);
   }
 
   return _.reduce(schema, (acc, val, key) => {
@@ -224,7 +201,7 @@ export const getCollectionPopulateSchema = (getModel: Function, collectionId: st
       };
     }
     return acc;
-  }, {});
+  }, {} as PopulateSchema);
 };
 
 export const getFilterQueryByMainField = (data: Entity[], mainField: string) => {

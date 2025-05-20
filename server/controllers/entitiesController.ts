@@ -1,5 +1,5 @@
 import { Strapi } from '@strapi/strapi';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import {
   getAllEntityMedia,
   getCollectionPopulateSchema,
@@ -12,18 +12,18 @@ import { Entity, IntegrationEntity } from 'types/data';
 import { INTEGRATION_COLLECTION_UID } from '../utils/constants';
 
 export default ({ strapi }: { strapi: Strapi }) => ({
-  async getCollections(ctx) {
+  async getCollections(ctx: any) {
     ctx.body = await strapi.plugin('content-transfer').service('entitiesService').getCollections();
   },
-  async getEntitiesByCollection(ctx) {
+  async getEntitiesByCollection(ctx: any) {
     ctx.body = await strapi.plugin('content-transfer').service('entitiesService').getEntitiesByCollection(ctx.params.collectionId);
   },
 
-  async uploadEntities(ctx) {
+  async uploadEntities(ctx: any) {
     const payload: UploadEntitiesPayload = ctx.request.body;
     const { collection, entities, integrationId } = payload;
 
-    const integration = await strapi.entityService.findOne(INTEGRATION_COLLECTION_UID, integrationId) as IntegrationEntity;
+    const integration = await strapi.entityService?.findOne(INTEGRATION_COLLECTION_UID, integrationId) as IntegrationEntity;
 
     if (!integration) {
       return {
@@ -40,7 +40,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
     const relationFields = getRelationFields(getStrapiModel, collection.id);
 
     if (!_.isEmpty(entities)) {
-      const createEntitiesWithFullData = await strapi.entityService.findMany(collection.id, {
+      const createEntitiesWithFullData = await strapi.entityService?.findMany(collection.id, {
         populate: { ...populateSchema, localizations: true },
         filters: {
           id: _.map(entities, (entity: Entity) => entity.id),
@@ -50,7 +50,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
       // need to populate all fields in localizations in case the default locales differ/transferring locales
       for (const createEntityData of createEntitiesWithFullData as Entity[]) {
         const localeIds = _.map(createEntityData.localizations, l => l.id);
-        createEntityData.localizations = await strapi.entityService.findMany(collection.id, {
+        createEntityData.localizations = await strapi.entityService?.findMany(collection.id, {
           populate: populateSchema,
           locale: 'all',
           filters: {

@@ -21,7 +21,7 @@ export const createParentRelation = async (payload: CreateParentRelationPayload)
   // find connected remote localizations from local translations
   const { localizations, mainLocaleParent } = getConnectedLocalizations(remoteLocalizations, localLocalizations, mainField, currentRelation.locale);
 
-// if localizations have the default locale entity, it means the main field has changed and we need to update the existing remote entity
+// if localizations have the default locale entity, it means the main field has changed, and we need to update the existing remote entity
   if (mainLocaleParent) {
     return await updateEntity({
       createMissingRelations,
