@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-content-transfer",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Transfer content between strapi instances. Supports the transfer of related media files, entities and locales",
   "strapi": {
     "name": "content-transfer",
@@ -12,7 +12,7 @@
     "develop": "tsc -p tsconfig.server.json -w",
     "build": "tsc -p tsconfig.server.json",
     "check-types": "tsc -p tsconfig.server.json --noEmit",
-    "prepublish": "yarn build"
+    "prepublishOnly": "yarn build"
   },
   "files": [
     "dist/",
